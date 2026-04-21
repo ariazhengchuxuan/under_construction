@@ -1237,6 +1237,11 @@
     <script type="text/babel">
         const { useState } = React;
 
+        /* ─── ANALYTICS HELPER ─── */
+        const trackEvent = (name, props = {}) => {
+            try { if (window.op) window.op('track', name, props); } catch(e) {}
+        };
+
         /* ─── SHARED PRIMITIVES ─── */
 
         function useInView(options = { threshold: 0.15 }) {
@@ -1277,6 +1282,19 @@
             );
         }
 
+        /* Observe when an element enters viewport → fires section_viewed once */
+        function SectionTracker({ name }) {
+            const ref = React.useRef(null);
+            React.useEffect(() => {
+                if (!ref.current) return;
+                const obs = new IntersectionObserver(([e]) => {
+                    if (e.isIntersecting) { trackEvent('section_viewed', { section: name }); obs.disconnect(); }
+                }, { threshold: 0.2 });
+                obs.observe(ref.current);
+                return () => obs.disconnect();
+            }, [name]);
+            return <div ref={ref} style={{ height: '1px', marginBottom: '-1px', pointerEvents: 'none' }} />;
+        }
         function ExpandableImage({ src, alt, containerStyle, ...props }) {
             const [expanded, setExpanded] = useState(false);
             const [zoomed, setZoomed] = useState(false);
@@ -1322,8 +1340,8 @@
 
         function ImageCarousel({ images }) {
             const [idx, setIdx] = useState(0);
-            const prev = () => setIdx(i => i === 0 ? images.length - 1 : i - 1);
-            const next = () => setIdx(i => (i + 1) % images.length);
+            const prev = () => { setIdx(i => i === 0 ? images.length - 1 : i - 1); trackEvent('carousel_previous_clicked'); trackEvent('carousel_slide_changed', { direction: 'prev' }); };
+            const next = () => { setIdx(i => (i + 1) % images.length); trackEvent('carousel_next_clicked'); trackEvent('carousel_slide_changed', { direction: 'next' }); };
             return (
                 <div className="img-carousel">
                     <div className="carousel-img-container">
@@ -1383,7 +1401,8 @@
                 window.addEventListener('resize', onResize);
                 return () => window.removeEventListener('resize', onResize);
             }, []);
-            const navigate = p => { window.location.hash = p === 'home' ? '' : `#${p}`; setMenuOpen(false); setOpenSection(null); setOpenSub(null); };
+            const NAV_EVENTS = {'home':'nav_home_clicked','climate-change':'nav_home_clicked','methodology':'nav_methodology_clicked','methodology-detail':'nav_methodology_clicked','flood-modelling':'nav_methodology_clicked','wildfire-modelling':'nav_methodology_clicked','team':'nav_team_clicked','partners':'nav_team_clicked','sponsors':'nav_team_clicked','events':'nav_team_clicked','contact':'nav_contact_clicked','don-river':'case_card_don_river_clicked','don-river-problem':'case_card_don_river_clicked','don-river-solution':'case_card_don_river_clicked','don-river-viz':'case_card_don_river_clicked','etobicoke':'case_card_etobicoke_clicked','etobicoke-problem':'case_card_etobicoke_clicked','etobicoke-solution':'case_card_etobicoke_clicked','etobicoke-viz':'case_card_etobicoke_clicked','fort-mcmurray':'case_card_wildfire_clicked','north-rustico':'case_card_coastal_clicked'};
+            const navigate = p => { trackEvent(NAV_EVENTS[p] || 'nav_link_clicked', { destination: p }); window.location.hash = p === 'home' ? '' : `#${p}`; setMenuOpen(false); setOpenSection(null); setOpenSub(null); };
             const toggleSection = k => { setOpenSection(prev => prev === k ? null : k); setOpenSub(null); };
             const Arr = () => (<svg className="nav-link-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>);
             const Burger = () => (<button className="nav-hamburger" onClick={() => { setMenuOpen(o => !o); setOpenSection(null); setOpenSub(null); }} aria-label="menu"><span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }} /><span style={{ opacity: menuOpen ? 0 : 1 }} /><span style={{ transform: menuOpen ? 'rotate(-45deg) translate(5px,-5px)' : 'none' }} /></button>);
@@ -1543,7 +1562,7 @@
             const [playing, setPlaying] = React.useState(false);
             const videoRef = React.useRef(null);
 
-            const handlePlay = () => { setPlaying(true); setStarted(true); };
+            const handlePlay = () => { setPlaying(true); setStarted(true); trackEvent('case_video_play_clicked', { location: 'hero' }); };
             const handlePause = () => setPlaying(false);
             const handleOverlayClick = () => {
                 if (videoRef.current) videoRef.current.play().catch(() => { });
@@ -1562,7 +1581,7 @@
                             <h1 style={{ fontSize: '3.8rem', fontWeight: '700', color: 'var(--primary)', lineHeight: '1.1', marginBottom: '1.5rem', letterSpacing: '-0.03em' }}>
                                 Seeing the Future of Our Climate.
                             </h1>
-                            <button onClick={() => { window.location.hash = 'don-river'; }} style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem', fontWeight: '600', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '50px', cursor: 'pointer', boxShadow: '0 8px 20px rgba(22, 63, 89, 0.25)', transition: 'transform 0.2s', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }} data-track="cta_see_our_work" onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                            <button onClick={() => { window.location.hash = 'don-river'; trackEvent('hero_explore_clicked'); }} style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem', fontWeight: '600', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '50px', cursor: 'pointer', boxShadow: '0 8px 20px rgba(22, 63, 89, 0.25)', transition: 'transform 0.2s', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }} data-track="cta_see_our_work" onMouseOver={e => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
                                 See Our Work <span style={{ fontSize: '1.2rem' }}>→</span>
                             </button>
                         </div>
@@ -1614,6 +1633,7 @@
                         </div>
                     </div>
 
+                    <SectionTracker name="landing_intro" />
                     <div style={{
                         maxWidth: '1100px',
                         margin: '0 auto',
@@ -1697,6 +1717,7 @@
                     <div className="content-page">
                         <div className="content-page-header"><h1>Our Methodology</h1></div>
                         <div className="c-group">
+                            <SectionTracker name="methodology_intro" />
                             <Block label="Vision">
                                 <p>To build computer simulation models of extreme weather events and then translate them into accessible images and experiences. To help individuals and communities</p>
                                 <ul style={{ listStyle: 'none', paddingLeft: '1.25rem', margin: '0.5rem 0 0.9rem' }}>
@@ -1748,10 +1769,10 @@
                             <Block label="U of T Magazine Feature">
                                 <p>We are thrilled to have our project highlighted among other inspiring student initiatives. Read the full feature on the official website, or view the complete magazine directly:</p>
                                 <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-                                    <a className="text-link ext" href="https://sustainability.utoronto.ca/student-leadership/" target="_blank" rel="noopener noreferrer">
+                                    <a className="text-link ext" href="https://sustainability.utoronto.ca/student-leadership/" target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('resource_link_clicked', { resource: 'sustainability_website' })}>
                                         <strong>Visit Official Website</strong>
                                     </a>
-                                    <a className="text-link ext" href="https://sustainability.utoronto.ca/wp-content/uploads/2026/04/SLS-Sustainability-Research-Magazine-2026-PDF.pdf" target="_blank" rel="noopener noreferrer">
+                                    <a className="text-link ext" href="https://sustainability.utoronto.ca/wp-content/uploads/2026/04/SLS-Sustainability-Research-Magazine-2026-PDF.pdf" target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('poster_pdf_opened', { resource: 'magazine_2026' })}>
                                         <strong>Download Magazine PDF</strong>
                                     </a>
                                 </div>
@@ -2293,7 +2314,7 @@
                         <div className="c-group">
                             <Block full>
                                 <p>If you would like to learn more about our work, please feel free to reach out. We welcome inquiries from researchers, educators, policymakers, and members of the public who are interested in climate change visualization and extreme weather modelling.</p>
-                                <p>You can contact us by email at: <a className="text-link" href="mailto:ronald.baecker@utoronto.ca">ronald.baecker@utoronto.ca</a></p>
+                                <p>You can contact us by email at: <a className="text-link" href="mailto:ronald.baecker@utoronto.ca" onClick={() => trackEvent('contact_email_clicked', { email: 'ronald.baecker@utoronto.ca' })}>ronald.baecker@utoronto.ca</a></p>
                             </Block>
                         </div>
                     </div>
@@ -2357,12 +2378,8 @@
                     const h = window.location.hash.replace('#', '') || 'home'; 
                     setPage(h); 
                     window.scrollTo({ top: 0, behavior: 'smooth' }); 
-                    
-                    // Force Analytics Tracking for Hash Routing SPA
-                    if (window.op) {
-                        try { window.op('trackScreenView'); } catch(e) {}
-                        try { window.op('track', 'Page Opened', { page: h }); } catch(e) {}
-                    }
+                    if (window.op) { try { window.op('trackScreenView'); } catch(e) {} }
+                    trackEvent('page_view_manual', { page: h });
                 };
                 window.addEventListener('hashchange', handle);
                 handle();

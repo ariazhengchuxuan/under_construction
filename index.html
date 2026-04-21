@@ -1241,6 +1241,57 @@
         const trackEvent = (name, props = {}) => {
             try { if (window.op) window.op('track', name, props); } catch(e) {}
         };
+        /* ─── SCROLL DEPTH TRACKER ─── */
+        (function() {
+            const thresholds = [25, 50, 75, 100];
+            const fired = {};
+            const getPage = () => (window.location.hash.replace('#', '') || 'home');
+            window.addEventListener('hashchange', () => { Object.keys(fired).forEach(k => delete fired[k]); });
+            window.addEventListener('scroll', function() {
+                const doc = document.documentElement;
+                const scrollTop = window.pageYOffset || doc.scrollTop;
+                const scrollHeight = doc.scrollHeight - doc.clientHeight;
+                if (scrollHeight <= 0) return;
+                const pct = Math.round((scrollTop / scrollHeight) * 100);
+                const pg = getPage();
+                thresholds.forEach(t => {
+                    const key = pg + '_' + t;
+                    if (pct >= t && !fired[key]) {
+                        fired[key] = true;
+                        trackEvent('scroll_depth', { page: pg, depth: t + '%' });
+                    }
+                });
+            }, { passive: true });
+        })();
+
+        /* ─── TIME ON PAGE TRACKER ─── */
+        (function() {
+            let pageStart = Date.now();
+            let currentPage = window.location.hash.replace('#', '') || 'home';
+            window.addEventListener('hashchange', () => {
+                const elapsed = Math.round((Date.now() - pageStart) / 1000);
+                if (elapsed > 1) trackEvent('time_on_page', { page: currentPage, seconds: elapsed });
+                currentPage = window.location.hash.replace('#', '') || 'home';
+                pageStart = Date.now();
+            });
+            window.addEventListener('beforeunload', () => {
+                const elapsed = Math.round((Date.now() - pageStart) / 1000);
+                if (elapsed > 1) trackEvent('time_on_page', { page: currentPage, seconds: elapsed });
+            });
+        })();
+
+        /* ─── SESSION METADATA ─── */
+        (function() {
+            const w = window.innerWidth;
+            const device = w <= 500 ? 'mobile' : w <= 860 ? 'tablet' : 'desktop';
+            trackEvent('session_start', {
+                device_type: device,
+                viewport: w + 'x' + window.innerHeight,
+                referrer: document.referrer || 'direct',
+                language: navigator.language || 'unknown'
+            });
+        })();
+
 
         /* ─── SHARED PRIMITIVES ─── */
 
@@ -1299,12 +1350,12 @@
             const [expanded, setExpanded] = useState(false);
             const [zoomed, setZoomed] = useState(false);
 
-            const close = (e) => { e.stopPropagation(); setExpanded(false); setZoomed(false); };
+            const close = (e) => { e.stopPropagation(); setExpanded(false); setZoomed(false); trackEvent('image_close', { image: alt }); };
             const toggleZoom = (e) => { e.stopPropagation(); setZoomed(!zoomed); };
 
             return (
                 <div style={{ position: 'relative', width: '100%', ...containerStyle }}>
-                    <img src={src} alt={alt} {...props} style={{ ...props.style, cursor: 'pointer' }} onClick={() => setExpanded(true)} />
+                    <img src={src} alt={alt} {...props} style={{ ...props.style, cursor: 'pointer' }} onClick={() => { setExpanded(true); trackEvent('image_expand_clicked', { image: alt }); }} />
                     <button onClick={() => setExpanded(true)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border)', borderRadius: '4px', padding: '6px 12px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', color: 'var(--ink)', zIndex: 2, display: 'flex', alignItems: 'center', gap: '4px' }} data-track="image_expand">
                         <span>⛶</span> Expand
                     </button>
@@ -1406,7 +1457,7 @@
             const navigate = p => { trackEvent(NAV_EVENTS[p] || 'nav_link_clicked', { destination: p }); window.location.hash = p === 'home' ? '' : `#${p}`; setMenuOpen(false); setOpenSection(null); setOpenSub(null); };
             const toggleSection = k => { setOpenSection(prev => prev === k ? null : k); setOpenSub(null); };
             const Arr = () => (<svg className="nav-link-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>);
-            const Burger = () => (<button className="nav-hamburger" onClick={() => { setMenuOpen(o => !o); setOpenSection(null); setOpenSub(null); }} aria-label="menu"><span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }} /><span style={{ opacity: menuOpen ? 0 : 1 }} /><span style={{ transform: menuOpen ? 'rotate(-45deg) translate(5px,-5px)' : 'none' }} /></button>);
+            const Burger = () => (<button className="nav-hamburger" onClick={() => { const next = !menuOpen; setMenuOpen(o => !o); setOpenSection(null); setOpenSub(null); trackEvent(next ? 'mobile_menu_opened' : 'mobile_menu_closed'); }} aria-label="menu"><span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }} /><span style={{ opacity: menuOpen ? 0 : 1 }} /><span style={{ transform: menuOpen ? 'rotate(-45deg) translate(5px,-5px)' : 'none' }} /></button>);
             return (
                 <nav className="nav">
                     <div className="nav-brand-bar">
@@ -1527,8 +1578,20 @@
         }
 
         function Footer() {
+            const footerRef = React.useRef(null);
+            React.useEffect(() => {
+                if (!footerRef.current) return;
+                const obs = new IntersectionObserver(([e]) => {
+                    if (e.isIntersecting) {
+                        trackEvent('footer_reached', { page: window.location.hash.replace('#', '') || 'home' });
+                        obs.disconnect();
+                    }
+                }, { threshold: 0.3 });
+                obs.observe(footerRef.current);
+                return () => obs.disconnect();
+            }, []);
             return (
-                <footer className="footer">
+                <footer className="footer" ref={footerRef}>
                     <div className="footer-content">
                         <nav className="footer-nav">
                             <a className="footer-nav-link" onClick={() => { window.location.hash = ''; }} data-track="footer_nav_home">Home</a>
@@ -1678,6 +1741,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Climate and Weather</h1></div>
+                        <SectionTracker name="climate_change_intro" />
                         <div className="c-group">
                             <Block full>
                                 <p>For over two centuries, scientists have been advancing our understanding of the effects of greenhouse gas emissions on the earth's climate.</p>
@@ -1796,6 +1860,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Flood Modelling</h1></div>
+                        <SectionTracker name="flood_modelling_intro" />
                         <div className="c-group">
                             <Block full>
                                 <p>Our work proceeds as a series of case studies. The locations we study have experienced one or several instances of severe flooding and have gathered reliable data with which to calibrate and validate our models.</p>
@@ -2241,6 +2306,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Partners</h1></div>
+                        <SectionTracker name="partners" />
                         <div className="c-group">
                             <Block full>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -2289,6 +2355,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Sponsors</h1></div>
+                        <SectionTracker name="sponsors" />
                         <div className="c-group">
                             <Block label="Institutional">
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -2312,6 +2379,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Contact</h1></div>
+                        <SectionTracker name="contact" />
                         <div className="c-group">
                             <Block full>
                                 <p>If you would like to learn more about our work, please feel free to reach out. We welcome inquiries from researchers, educators, policymakers, and members of the public who are interested in climate change visualization and extreme weather modelling.</p>
@@ -2330,6 +2398,7 @@
                 <>
                     <div className="content-page">
                         <div className="content-page-header"><h1>Events</h1></div>
+                        <SectionTracker name="events" />
                         <div className="c-group">
                             <Block label="Sustainability Week">
                                 <p>Our team participated in <strong>Sustainability Week</strong>, showcasing our climate visualization work and engaging with students, faculty, and community members about the impacts of extreme weather and the importance of climate action.</p>

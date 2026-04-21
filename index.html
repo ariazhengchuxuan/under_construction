@@ -66,6 +66,11 @@
         trackOutgoingLinks: true,
         trackAttributes: true,
       });
+      
+      // Environment isolation: Tag all events with the current environment
+      const isProd = window.location.hostname === 'envisioningclimatefutures.org';
+      window.op('set', { env: isProd ? 'production' : 'development' });
+      window.op('track', 'Session Start', { environment: isProd ? 'production' : 'development' });
     </script>
     <script src="https://openpanel.dev/op1.js" defer async></script>
     <!-- Vercel Web Analytics -->

@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envisioning Climate Change</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --blue: #1e4d6b;
+            --blue-mid: #2e6e96;
+            --blue-light: #5a9ab8;
+            --blue-pale: #e8f3f8;
+            --green: #2a6b52;
+            --green-light: #4a9678;
+            --green-pale: #e6f2ed;
+            --white: #ffffff;
+            --bg: #f4f8fb;
+            --ink: #1a2a34;
+            --ink-mid: #4a5e6a;
+            --ink-light: #8aa0ae;
+            --rule: rgba(30, 77, 107, 0.12);
+            --shadow-sm: 0 1px 4px rgba(30, 77, 107, 0.07);
+            --shadow-md: 0 6px 24px rgba(30, 77, 107, 0.11);
+
+            /* legacy aliases */
+            --primary: var(--blue);
+            --primary-mid: var(--blue-mid);
+            --secondary: var(--blue-light);
+            --accent: #c0531e;
+            --accent-light: #d4724a;
+            --hope-green: var(--green);
+            --teal: #2a7272;
+            --water: #8ec6de;
+            --warm: #c4883a;
+            --sky: #6aaec6;
+            --bg-light: var(--bg);
+            --bg-white: var(--white);
+            --text: var(--ink);
+            --text-medium: var(--ink-mid);
+            --text-light: var(--ink-light);
+            --border: var(--rule);
+            --ink-rule: var(--rule);
+            --shadow-lg: 0 16px 48px rgba(30, 77, 107, 0.13);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            line-height: 1.18;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(244, 248, 251, 0.97);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 62px;
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.15rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            white-space: nowrap;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(26, 74, 107, 0.07);
+        }
+
+        .nav-link-arrow {
+            font-size: 0.6rem;
+            opacity: 0.45;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover .nav-link-arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            background: white;
+            min-width: 255px;
+            box-shadow: 0 12px 40px rgba(26, 74, 107, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(26, 74, 107, 0.09);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+            padding: 0.4rem;
+        }
+
+        .nav-item:hover .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-dropdown-item {
+            padding: 0.6rem 1rem;
+            color: var(--text-medium);
+            display: block;
+            transition: all 0.15s;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .nav-dropdown-item:hover {
+            background: rgba(26, 74, 107, 0.06);
+            color: var(--primary);
+        }
+
+        .nav-sub-item {
+            position: relative;
+        }
+
+        .nav-sub-item>.nav-dropdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-sub-item>.nav-dropdown-item::after {
+            content: '›';
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-left: 0.5rem;
+        }
+
+        .nav-sub-dropdown {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            left: auto;
+            margin-right: 4px;
+            background: white;
+            min-width: 205px;
+            box-shadow: 0 12px 40px rgba(26, 74, 107, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(26, 74, 107, 0.09);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(8px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+            padding: 0.4rem;
+        }
+
+        .nav-sub-item:hover .nav-sub-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        /* ── PROGRESS ── */
+        .progress-indicator {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s;
+        }
+
+        .progress-dot.active {
+            background: var(--primary);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: linear-gradient(135deg, #0f2a3f 0%, #1a4a6b 60%, #0d3d5a 100%);
+            padding: 3.5rem 2rem;
+            margin-top: 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(93, 183, 212, 0.12) 0%, transparent 70%);
+        }
+
+        .footer::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 10%;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 98, 42, 0.1) 0%, transparent 70%);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            flex-wrap: wrap;
+        }
+
+        .footer-nav-link {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .footer-nav-link:hover {
+            color: var(--water);
+        }
+
+        .footer-copyright {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-logos img {
+            height: 52px;
+            max-width: 140px;
+            object-fit: contain;
+            opacity: 0.6;
+            filter: brightness(0) invert(1);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .footer-logos img:hover {
+            opacity: 1;
+            transform: scale(1.06);
+        }
+
+        /* ── LANDING ── */
+        .landing {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 6rem 2rem 4rem;
+            background: var(--bg);
+        }
+
+        .landing-content {
+            max-width: 860px;
+            text-align: center;
+        }
+
+        /* ── SCENARIO & METHODS ── */
+        .scenario-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .scenario-page h1 {
+            font-size: 2.6rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .scenario-page h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            color: var(--text-medium);
+            line-height: 1.75;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .scenario-card {
+            background: var(--bg-white);
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .scenario-card:hover {
+            border-color: var(--primary-mid);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+
+        .scenario-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .scenario-card.inaction h3 {
+            color: var(--accent);
+        }
+
+        .scenario-card.action h3 {
+            color: var(--hope-green);
+        }
+
+        .damage-image-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .damage-image {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            background: var(--bg-light);
+            border: 2px dashed var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-style: italic;
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+
+        .damage-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .image-caption {
+            font-size: 0.88rem;
+            color: var(--text-medium);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        /* ── TEAM ── */
+        .team-page {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .team-page h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .team-intro {
+            text-align: center;
+            font-size: 1.15rem;
+            color: var(--text-medium);
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            line-height: 1.8;
+        }
+
+        .team-section {
+            margin-bottom: 4.5rem;
+        }
+
+        .team-section-title {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(58, 140, 110, 0.3);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .team-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(26, 74, 107, 0.25);
+        }
+
+        .team-photo {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 1.25rem auto 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border: 3px solid rgba(26, 74, 107, 0.1);
+        }
+
+        .team-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .team-info {
+            padding: 0.85rem 1.1rem 1.1rem;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .team-role {
+            font-size: 0.82rem;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-affiliation {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── METHODS ── */
+        .methods-page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .methods-page h1 {
+            font-size: 2.4rem;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+        }
+
+        .methods-page h2 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.68rem;
+            color: var(--ink-light);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .methods-section {
+            margin-bottom: 1.75rem;
+            padding: 1.75rem 2rem;
+            background: var(--bg-white);
+            border-radius: 3px;
+            border: 1px solid var(--ink-rule);
+        }
+
+        .methods-section p {
+            color: var(--ink-mid);
+            line-height: 1.8;
+            margin-bottom: 0.9rem;
+            font-size: 0.965rem;
+        }
+
+        .methods-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .methods-section ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .methods-section li {
+            margin-bottom: 0.55rem;
+            color: var(--ink-mid);
+            line-height: 1.7;
+            font-size: 0.965rem;
+        }
+
+        .explanation-box {
+            background: rgba(46, 106, 84, 0.04);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 2px solid var(--hope-green);
+        }
+
+        .explanation-box h4 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.68rem;
+            margin-bottom: 0.5rem;
+            color: var(--hope-green);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .highlight-box {
+            background: rgba(26, 26, 24, 0.03);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 2px solid var(--ink-light);
+        }
+
+        .highlight-box p {
+            font-size: 1rem;
+            color: var(--ink);
+            font-style: italic;
+        }
+
+        /* ── NAV BUTTONS ── */
+        .nav-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            padding: 0.7rem 1.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--blue);
+            color: white;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            min-width: 150px;
+            letter-spacing: 0.02em;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .nav-button:hover {
+            opacity: 0.82;
+        }
+
+        .nav-button.prev {
+            background: transparent;
+            color: var(--blue);
+            border: 1px solid var(--rule);
+        }
+
+        .nav-button.prev:hover {
+            background: var(--white);
+            border-color: var(--blue);
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ── HAMBURGER ── */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            background: none;
+            border: none;
+        }
+
+        .nav-hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--blue);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 860px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-hamburger {
+                display: flex !important;
+            }
+
+            .nav-content {
+                padding: 0 1.25rem;
+            }
+
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 62px;
+                left: 0;
+                right: 0;
+                background: white;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 12px 32px rgba(26, 74, 107, 0.1);
+                padding: 0.5rem 0 1rem;
+                gap: 0;
+                animation: fadeIn 0.2s ease;
+            }
+
+            .nav-item {
+                width: 100%;
+            }
+
+            .nav-link {
+                font-size: 0.95rem;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0;
+                justify-content: space-between;
+                border-bottom: 1px solid rgba(26, 74, 107, 0.05);
+                background: none !important;
+            }
+
+            .nav-link:hover {
+                background: rgba(26, 74, 107, 0.04) !important;
+            }
+
+            .nav-dropdown {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                min-width: unset !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: rgba(26, 74, 107, 0.025) !important;
+            }
+
+            .nav-dropdown-item {
+                padding: 0.6rem 1.5rem 0.6rem 2.5rem;
+                font-size: 0.875rem;
+                border-radius: 0;
+                border-bottom: 1px solid rgba(26, 74, 107, 0.04);
+            }
+
+            .nav-sub-dropdown {
+                position: static !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                min-width: unset !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: rgba(26, 74, 107, 0.04) !important;
+            }
+
+            .nav-sub-dropdown .nav-dropdown-item {
+                padding-left: 3.5rem;
+                font-size: 0.84rem;
+            }
+
+            .nav-sub-item>.nav-dropdown-item::after {
+                content: '';
+            }
+        }
+
+        @media (max-width: 968px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .landing-statement {
+                font-size: 1.1rem;
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .scenario-page,
+            .methods-page,
+            .team-page {
+                padding: 7rem 1rem 3rem;
+            }
+
+            .methods-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState } = React;
+
+        function Navigation({ currentPage }) {
+            const { useState: useLocalState, useEffect } = React;
+            const [menuOpen, setMenuOpen] = useLocalState(false);
+            const [openSection, setOpenSection] = useLocalState(null);
+            const [openSub, setOpenSub] = useLocalState(null);
+
+            const isMobile = () => window.innerWidth <= 860;
+
+            // Close menu on resize to desktop
+            useEffect(() => {
+                const onResize = () => { if (!isMobile()) { setMenuOpen(false); setOpenSection(null); setOpenSub(null); } };
+                window.addEventListener('resize', onResize);
+                return () => window.removeEventListener('resize', onResize);
+            }, []);
+
+            const navigate = (page) => {
+                window.location.hash = page === 'home' ? '' : `#${page}`;
+                setMenuOpen(false);
+                setOpenSection(null);
+                setOpenSub(null);
+            };
+
+            const toggleSection = (key) => {
+                setOpenSection(prev => prev === key ? null : key);
+                setOpenSub(null);
+            };
+
+            const toggleSub = (e, key) => {
+                e.stopPropagation();
+                setOpenSub(prev => prev === key ? null : key);
+            };
+
+            // On mobile: show/hide via state; on desktop: CSS hover handles it (no inline style)
+            const mobileDropStyle = (key) => isMobile()
+                ? { display: openSection === key ? 'block' : 'none' }
+                : {};
+            const mobileSubStyle = (key) => isMobile()
+                ? { display: openSub === key ? 'block' : 'none' }
+                : {};
+
+            const DownArrow = () => (
+                <svg className="nav-link-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            );
+
+            // Hamburger animated icon
+            const HamburgerIcon = () => (
+                <button
+                    className="nav-hamburger"
+                    onClick={() => { setMenuOpen(o => !o); setOpenSection(null); setOpenSub(null); }}
+                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                >
+                    <span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+                    <span style={{ opacity: menuOpen ? 0 : 1, transform: menuOpen ? 'scaleX(0)' : 'none' }} />
+                    <span style={{ transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+                </button>
+            );
+
+            return (
+                <nav className="nav" style={{ position: 'fixed' }}>
+                    <div className="nav-content">
+                        <div className="nav-logo" onClick={() => navigate('home')}>
+                            Envisioning Climate Change
+                        </div>
+                        <HamburgerIcon />
+                        <div className={`nav-links${menuOpen ? ' open' : ''}`}>
+
+                            {/* Climate and Weather */}
+                            <div className="nav-item">
+                                <span className="nav-link" onClick={() => isMobile() && toggleSection('climate')}>
+                                    Climate and Weather <DownArrow />
+                                </span>
+                                <div className="nav-dropdown" style={mobileDropStyle('climate')}>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('climate-change')}>Climate change</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('extreme-weather')}>Extreme weather</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('climate-fuels')}>How climate change fuels extreme weather</a>
+                                </div>
+                            </div>
+
+                            {/* What We Do */}
+                            <div className="nav-item">
+                                <span className="nav-link" onClick={() => isMobile() && toggleSection('whatwedo')}>
+                                    What We Do <DownArrow />
+                                </span>
+                                <div className="nav-dropdown" style={mobileDropStyle('whatwedo')}>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('methodology')}>Our methodology</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('flood-modelling')}>Modelling and visualizing floods</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('wildfire-modelling')}>Modelling and visualizing wildfires</a>
+                                </div>
+                            </div>
+
+                            {/* Examples */}
+                            <div className="nav-item">
+                                <span className="nav-link" onClick={() => isMobile() && toggleSection('examples')}>
+                                    Examples <DownArrow />
+                                </span>
+                                <div className="nav-dropdown" style={mobileDropStyle('examples')}>
+                                    <div className="nav-sub-item">
+                                        <a className="nav-dropdown-item" onClick={(e) => isMobile() ? toggleSub(e, 'don') : navigate('don-river')}>
+                                            Don River flooding (Toronto)
+                                            {isMobile() && (
+                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0, transform: openSub === 'don' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                                                    <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            )}
+                                        </a>
+                                        <div className="nav-sub-dropdown" style={mobileSubStyle('don')}>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('don-river-problem')}>The Problem</a>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('don-river-solution')}>A Proposed Solution</a>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('don-river-viz')}>Visualizations</a>
+                                        </div>
+                                    </div>
+                                    <div className="nav-sub-item">
+                                        <a className="nav-dropdown-item" onClick={(e) => isMobile() ? toggleSub(e, 'etobicoke') : navigate('etobicoke')}>
+                                            Etobicoke Creek flooding (Mississauga)
+                                            {isMobile() && (
+                                                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ flexShrink: 0, transform: openSub === 'etobicoke' ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                                                    <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            )}
+                                        </a>
+                                        <div className="nav-sub-dropdown" style={mobileSubStyle('etobicoke')}>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('etobicoke-problem')}>The Problem</a>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('etobicoke-solution')}>A Proposed Solution</a>
+                                            <a className="nav-dropdown-item" onClick={() => navigate('etobicoke-viz')}>Visualizations</a>
+                                        </div>
+                                    </div>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('north-rustico')}>North Rustico flooding (PEI)</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('fort-mcmurray')}>Fort McMurray wildfire (Alberta)</a>
+                                </div>
+                            </div>
+
+                            {/* Who We Are */}
+                            <div className="nav-item">
+                                <span className="nav-link" onClick={() => isMobile() && toggleSection('whoweare')}>
+                                    Who We Are <DownArrow />
+                                </span>
+                                <div className="nav-dropdown" style={mobileDropStyle('whoweare')}>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('team')}>Team</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('partners')}>Partners</a>
+                                    <a className="nav-dropdown-item" onClick={() => navigate('sponsors')}>Sponsors</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </nav>
+            );
+        }
+
+        function Footer() {
+            return (
+                <footer className="footer">
+                    <div className="footer-content">
+                        <nav className="footer-nav">
+                            <a className="footer-nav-link" onClick={() => { window.location.hash = ''; }}>Home</a>
+                            <a className="footer-nav-link" onClick={() => { window.location.hash = 'don-river'; }}>Examples</a>
+                            <a className="footer-nav-link" onClick={() => { window.location.hash = 'team'; }}>Teams</a>
+                            <a className="footer-nav-link" onClick={() => { window.location.hash = 'methodology'; }}>Methodology</a>
+                        </nav>
+                        <p className="footer-copyright">© 2025 Extreme Weather Future Lens. All rights reserved.</p>
+                        <div className="footer-logos">
+                            <img src="images/logo/logo_uoft.png" alt="University of Toronto" />
+                            <img src="images/logo/logo_ocad.png" alt="OCAD University" />
+                            <img src="images/logo/logo_upei.png" alt="University of Prince Edward Island" />
+                            <img src="images/logo/logo_viu.png" alt="Vancouver Island University" />
+                        </div>
+                    </div>
+                </footer>
+            );
+        }
+
+        function LandingPage() {
+            return (
+                <>
+                    <div className="landing" style={{ minHeight: '100vh', padding: '7rem 2rem 5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: '100%', maxWidth: '860px', textAlign: 'center' }}>
+
+                            {/* Video */}
+                            <div style={{
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.06)',
+                                border: '1px solid rgba(28,58,82,0.1)',
+                                marginBottom: '3.5rem',
+                                animation: 'fadeInUp 0.7s ease-out both',
+                                background: '#000'
+                            }}>
+                                <video controls style={{ width: '100%', display: 'block' }}>
+                                    <source src="https://res.cloudinary.com/dd4p37hyq/video/upload/v1772705408/movie2_qypurv.mp4" type="video/mp4" />
+                                </video>
+                            </div>
+
+                            {/* Text */}
+                            <div style={{ maxWidth: '680px', margin: '0 auto', animation: 'fadeInUp 0.7s ease-out 0.25s both', textAlign: 'left' }}>
+                                <p style={{
+                                    fontSize: '1.06rem', lineHeight: '1.9', color: 'var(--text)',
+                                    marginBottom: '1.5rem',
+                                    paddingLeft: '1.25rem',
+                                    borderLeft: '2px solid var(--accent)'
+                                }}>
+                                    People have long been warned about environmental harm from greenhouse gases. We see devastation from floods, fires, and heat, yet citizens and governments have not acted sufficiently to slow climate change. Global surface temperatures and extreme weather events still increase dangerously.
+                                </p>
+                                <p style={{ fontSize: '1rem', lineHeight: '1.9', color: 'var(--text-medium)', marginBottom: 0 }}>
+                                    Many climate communications are technical and despairing, causing fear and defensiveness. Others detail long lists of what people should do, causing confusion and indecision. Instead, we produce scientifically plausible future climate scenarios depicting what affects people the most — extreme weather. <br /><br />
+                                    <strong style={{ color: 'var(--primary)', fontSize: '1.1rem' }}>We create vivid and comprehensible messages and experiences portraying extreme weather. These begin with mathematically re-creating past weather events and then envisioning possible future variations of these events. Some futures depict the consequences of climate inaction. Others portray the constructive benefits of concrete and doable actions.</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function DonRiver({ onNext, onPrev }) {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of the Don River (Toronto)</h1>
+                        <DonRiverSubNav active="don-river" />
+                        <div className="methods-section">
+                            <p>The Don River has a long history of severe flooding that has shaped the development of Toronto. This case study examines past flood events, the engineering mistakes that worsened flooding, and the ambitious reconstruction project that transformed the river's mouth and the surrounding Port Lands.</p>
+                            <p>Use the tabs above to explore <strong>The Problem</strong> (the history and causes of flooding), <strong>A Proposed Solution</strong> (the Port Lands Flood Protection project), and <strong>Visualizations</strong> (our flood modelling results).</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Before &amp; After Reconstruction</h2>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+                                <figure style={{ margin: 0 }}>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707917/don_river_before_ozgwmd.png" alt="Don River mouth before reconstruction" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
+                                    <figcaption style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.82rem', marginTop: '0.5rem', fontStyle: 'italic' }}>Before reconstruction</figcaption>
+                                </figure>
+                                <figure style={{ margin: 0 }}>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707916/don_river_after_tzogow.png" alt="Don River mouth after reconstruction" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
+                                    <figcaption style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.82rem', marginTop: '0.5rem', fontStyle: 'italic' }}>After reconstruction (2025)</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Key Facts</h2>
+                            <ul>
+                                <li>The Don River drains approximately 1,200 km² of southern Ontario</li>
+                                <li>Major floods recorded in 1869, 1879, 1910, 1946, 1955, 1970, 2008, and 2024</li>
+                                <li>The 1886 "Don River Improvement Plan" created the problematic Keating Channel</li>
+                                <li>The Port Lands Flood Protection project, completed in 2025, re-engineered the river mouth and created a new naturalized river channel</li>
+                                <li>The project protects 15,000 new residents and significant industrial lands from flooding</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function Etobicoke({ onNext, onPrev }) {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of Little Etobicoke Creek (Mississauga)</h1>
+                        <EtobicokeSubNav active="etobicoke" />
+                        <div className="methods-section">
+                            <p>The Little Etobicoke Creek (LEC) winds its way southwards in central Mississauga, flowing through an area where natural absorptive lands have been heavily replaced by urban infrastructure. This case study examines the impact of increasingly severe storms on this vulnerable corridor, resulting in destructive floods in recent decades.</p>
+                            <p>Use the tabs above to explore <strong>The Problem</strong> (the history and causes of flooding), <strong>A Proposed Solution</strong> (the planned improvements to the Dixie area), and <strong>Visualizations</strong> (our flood modelling results for 10-year, 100-year, and 350-year storms).</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Flood Scenarios</h2>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+                                <figure style={{ margin: 0 }}>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707917/etobicoke_10yr_wz7xaz.png" alt="10-Year Flood Scenario" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
+                                    <figcaption style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.82rem', marginTop: '0.5rem', fontStyle: 'italic' }}>10-Year Flood Scenario</figcaption>
+                                </figure>
+                                <figure style={{ margin: 0 }}>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707917/etobicoke_350yr_i5mn2a.png" alt="350-Year Flood Scenario" style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', borderRadius: '8px', display: 'block' }} />
+                                    <figcaption style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.82rem', marginTop: '0.5rem', fontStyle: 'italic' }}>350-Year Flood Scenario</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Key Facts</h2>
+                            <ul>
+                                <li>Much of the historical absorptive farmland in northern Mississauga has been paved over by homes and factories.</li>
+                                <li>Recent destructive flood events occurred in 2005, 2009, 2013, and twice in 2024.</li>
+                                <li>A proposed $80M mitigation plan involves widening the creek and upgrading the Dixie Road bridge.</li>
+                                <li>Modelling shows that these improvements must be performed in tandem; neither expanding the channel nor replacing the bridge succeeds independently.</li>
+                            </ul>
+                        </div>
+                        <div className="nav-buttons" style={{ marginTop: '2.5rem' }}>
+                            <button className="nav-button prev" onClick={onPrev}>← Back to Don River</button>
+                            <button className="nav-button" onClick={onNext}>Teams →</button>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function TeamPage({ onNext, onPrev }) {
+
+            const groups = [
+                {
+                    institution: "University of Toronto",
+                    label: "Faculty",
+                    accent: "blue",
+                    members: [
+                        { name: "Ron Baecker", title: "Emeritus Prof., Computer Science", focus: "Knowledge media design", photo: "images/toronto_Ron.jpg" },
+                        { name: "John Danahy", title: "Emeritus Prof., Landscape Architecture", focus: "3D visualizations for urban planning", photo: "images/toronto_Johny.jpg" },
+                        { name: "Fanny Chevalier", title: "Prof., Computer Science", focus: "Data visualization", photo: "images/toronto_Fanny.jpg" },
+                        { name: "Karan Singh", title: "Prof., Computer Science", focus: "3D animation & immersive technologies", photo: "images/toronto_Ksingh.jpg" },
+                        { name: "Steve Engels", title: "Prof., Computer Science", focus: "Computer games", photo: "images/toronto_Steve Engels.jpg" },
+                    ]
+                },
+                {
+                    institution: "University of PEI",
+                    label: "Faculty",
+                    accent: "green",
+                    members: [
+                        { name: "Xander Wang", title: "Prof., Climate Change and Adaptation", focus: "Climate modelling", photo: "images/upei_Xander.jpg" },
+                    ]
+                },
+                {
+                    institution: "VIU and University of Victoria",
+                    label: "Faculty",
+                    accent: "green",
+                    members: [
+                        { name: "Lindsay McCunn", title: "Prof., Psychology", focus: "Environmental psychology", photo: "images/viu_Lindsay.jpg" },
+                    ]
+                },
+                {
+                    institution: "OCAD University",
+                    label: "Faculty",
+                    accent: "blue",
+                    members: [
+                        { name: "Maya Desai", title: "Prof., Environmental Design", focus: "", photo: "images/toronto_Maya.jpg" },
+                        { name: "Angelika Seeschaaf-Veres", title: "Prof., Industrial Design", focus: "", photo: "images/ocadu_Angelika Seeschaaf Veres.jpg" },
+                        { name: "Koby Barhad", title: "Prof., Graphic Design", focus: "", photo: "images/ocadu_Koby Barhad.jpg" },
+                    ]
+                },
+                {
+                    institution: "Contributing Research Scientists",
+                    label: "",
+                    accent: "green",
+                    members: [
+                        { name: "Mike Wotton", title: "Dr., Canadian Forest Service", focus: "Fire ignition and behaviour modelling", photo: "images/toronto_MikeWotton.jpg" },
+                        { name: "Melanie Wheatley", title: "Dr., Ont. Ministry Natural Resources", focus: "Aviation Forest Fire & Emergency Services", photo: "images/ocadu_Melanie.jpg" },
+                    ]
+                },
+                {
+                    institution: "University of Toronto",
+                    label: "Students & Recent Grads",
+                    accent: "blue",
+                    members: [
+                        { name: "Jacob Klimczak", title: "4th year, Computer Science", focus: "", photo: "images/toronto_Jacob.jpg" },
+                        { name: "Junyoung Seok", title: "1st year MASc, Computer Science", focus: "", photo: "images/toronto_Junyoung.jpg" },
+                        { name: "Gregory Gismondi", title: "3rd year, Computer Science", focus: "", photo: "images/toronto_Gregory.jpg" },
+                        { name: "Aria Zheng", title: "3rd year, Comm. Culture, Info & Tech · UTM", focus: "", photo: "images/toronto_Aria.jpg" },
+                        { name: "Amanda Leiva", title: "Recent MASc grad, Mech. & Ind. Engineering", focus: "", photo: "images/toronto_Amanda.jpg .png" },
+                        { name: "Lisa Zhong", title: "4th year, Data Science", focus: "", photo: "images/toronto_Lisa.jpg" },
+                        { name: "Caroline Xu", title: "4th year, Computer Science", focus: "", photo: "images/toronto_caroline.jpg" },
+                        { name: "Akshata Kulkarni", title: "3rd year, Computer Science", focus: "", photo: "images/toronto_Alshata.jpg" },
+                        { name: "Claire Jaroonjetjumnong", title: "3rd year, Computer Science", focus: "", photo: "images/toronto_claire.jpg" },
+                        { name: "Michael Zhang", title: "3rd year, Math & Computer Science", focus: "", photo: "images/toronto_Michael.jpg" },
+                    ]
+                },
+            ];
+
+            const avatarBg = (accent) => accent === 'green'
+                ? 'linear-gradient(140deg, #c8e8dc 0%, #6ab89a 100%)'
+                : 'linear-gradient(140deg, #c8dff0 0%, #5a9ec6 100%)';
+
+            const accentBar = (accent) => accent === 'green' ? 'var(--green)' : 'var(--blue)';
+
+            const css = `
+                .tp-page {
+                    max-width: 1080px; margin: 0 auto;
+                    padding: 5rem 2rem 3rem;
+                }
+                .tp-masthead {
+                    padding-bottom: 1.5rem;
+                    margin-bottom: 2.5rem;
+                    border-bottom: 2px solid var(--blue);
+                    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1rem;
+                }
+                .tp-title {
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 3.2rem; font-weight: 500; font-style: italic;
+                    color: var(--blue); letter-spacing: -0.01em; line-height: 1.1;
+                }
+                .tp-desc {
+                    font-size: 0.9rem; color: var(--ink-mid); max-width: 600px;
+                    line-height: 1.65; text-align: center;
+                }
+                .tp-section { margin-bottom: 3.5rem; }
+                .tp-section-head {
+                    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+                    margin-bottom: 1.5rem;
+                    padding-bottom: 0.6rem;
+                    border-bottom: 1px solid var(--rule);
+                }
+                .tp-section-bar { display: none; }
+                .tp-section-inst {
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 1.3rem; font-weight: 500; color: var(--ink);
+                }
+                .tp-section-label {
+                    font-size: 0.65rem; font-weight: 600; color: var(--ink-light);
+                    text-transform: uppercase; letter-spacing: 0.14em;
+                    background: var(--bg);
+                    padding: 0.2rem 0.5rem;
+                    border-radius: 4px;
+                }
+                .tp-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 1.5rem;
+                }
+                .tp-card {
+                    background: transparent;
+                    width: 260px;
+                    padding: 1.75rem 1.25rem;
+                    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.6rem;
+                    transition: transform 0.3s ease;
+                    border-radius: 12px;
+                }
+                .tp-card:hover { 
+                    transform: translateY(-4px); 
+                }
+                .tp-avatar {
+                    width: 86px; height: 86px; border-radius: 50%;
+                    margin: 0 auto 0.5rem;
+                    flex-shrink: 0; overflow: hidden;
+                    display: flex; align-items: center; justify-content: center;
+                }
+                .tp-avatar img {
+                    width: 100%; height: 100%; object-fit: cover; display: block;
+                }
+                .tp-avatar-fallback {
+                    width: 100%; height: 100%;
+                    display: flex; align-items: center; justify-content: center;
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 1.5rem; font-weight: 500;
+                    color: var(--white);
+                }
+                .tp-info { min-width: 0; }
+                .tp-name {
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 1.15rem; font-weight: 500; color: var(--ink);
+                    line-height: 1.25; margin-bottom: 0.25rem;
+                }
+                .tp-role {
+                    font-size: 0.82rem; color: var(--ink-mid); line-height: 1.4;
+                    margin-bottom: 0.2rem;
+                }
+                .tp-focus {
+                    font-size: 0.75rem; color: var(--blue-light); font-style: italic;
+                    line-height: 1.35;
+                }
+                @media (max-width: 640px) {
+                    .tp-title { font-size: 2.4rem; }
+                    .tp-card { width: 100%; max-width: 320px; }
+                }
+            `;
+
+            const initials = (name) => name.split(' ').slice(0, 2).map(w => w[0]).join('');
+
+            return (
+                <>
+                    <style>{css}</style>
+                    <div className="tp-page">
+                        <div className="tp-masthead">
+                            <div className="tp-title">Our Team</div>
+                            <div className="tp-desc">A multidisciplinary team of researchers, designers, and scientists from universities across Canada.</div>
+                        </div>
+
+                        {groups.map((g, gi) => (
+                            <div key={gi} className="tp-section">
+                                <div className="tp-section-head">
+                                    <div className="tp-section-bar" style={{ background: accentBar(g.accent) }} />
+                                    <span className="tp-section-inst">{g.institution}</span>
+                                    {g.label && <span className="tp-section-label">{g.label}</span>}
+                                </div>
+                                <div className="tp-grid">
+                                    {g.members.map((m, mi) => (
+                                        <div key={mi} className="tp-card">
+                                            <div className="tp-avatar">
+                                                <img src={m.photo} alt={m.name}
+                                                    onError={e => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        e.currentTarget.nextSibling.style.display = 'flex';
+                                                    }} />
+                                                <div className="tp-avatar-fallback"
+                                                    style={{ background: avatarBg(g.accent), display: 'none' }}>
+                                                    {initials(m.name)}
+                                                </div>
+                                            </div>
+                                            <div className="tp-info">
+                                                <div className="tp-name">{m.name}</div>
+                                                <div className="tp-role">{m.title}</div>
+                                                {m.focus && <div className="tp-focus">{m.focus}</div>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        <div className="nav-buttons" style={{ marginTop: '4rem' }}>
+                            <button className="nav-button prev" onClick={onPrev}>← Back</button>
+                            <button className="nav-button" onClick={onNext}>Methodology →</button>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function MethodologyPage({ onPrev, onRestart }) {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Our Methodology</h1>
+                        <div className="methods-section">
+                            <h2>VISION</h2>
+                            <div style={{ color: 'var(--ink-mid)', lineHeight: '1.8', marginBottom: '1.5rem', fontSize: '0.965rem' }}>
+                                <div style={{ marginBottom: '0.9rem' }}>To build computer simulation models of extreme weather events and then translate them into accessible images and experiences. To help individuals and communities</div>
+                                <div style={{ paddingLeft: '1rem', marginBottom: '0.9rem' }}>
+                                    <div style={{ margin: 0 }}>a) better understand past extreme weather events;</div>
+                                    <div style={{ margin: 0 }}>b) imagine how future damage could be worse if nothing is done; and</div>
+                                    <div style={{ margin: 0 }}>c) see how constructive actions could reduce the damage from future storms.</div>
+                                </div>
+                                <div style={{ margin: 0 }}>To produce constructive change in the behaviour of individuals and more thoughtful and open policy deliberations by government.</div>
+                            </div>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Approach</h2>
+                            <p>Well-designed images help people engage thoughtfully with critical issues. We therefore visualize extreme weather events — situations where climate change affects people most directly. Depictions of floods and fires show what neighborhoods have experienced, how damage could become worse, and how risks would be reduced if we act soon. What is novel is how we create experiences that portray the difference between action and inaction and use these to motivate and enable constructive change.</p>
+                            <p>Our work integrates flood and fire modelling, data visualization, design, planning, and psychology. We develop novel visualizations and immersive environments. Unlike other work, and to maximize impact, images are designed for lay audiences, portray local phenomena, are based on real data and validated models; are static and dynamic; and portray optimistic and pessimistic scenarios.</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Goals</h2>
+                            <ul>
+                                <li>Create more immersive experiences (3D imagery, hypermedia, games, extended reality, lively exhibits);</li>
+                                <li>Speed up modelling and visualization processes;</li>
+                                <li>Demonstrate experimentally that these experiences affect the climate change engagement, understanding, and actions of individuals; and</li>
+                                <li>Deliver insightful experiences of actual or possible extreme weather to make citizen groups more knowledgeable; enrich schools curricula with learning units and games; and help government agencies charged with climate-related policy to conduct more thoughtful and open deliberations.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function DonRiverSubNav({ active }) {
+            const navigate = (p) => { window.location.hash = p; };
+            const items = [
+                { key: 'don-river', label: 'Overview' },
+                { key: 'don-river-problem', label: 'The Problem' },
+                { key: 'don-river-solution', label: 'A Proposed Solution' },
+                { key: 'don-river-viz', label: 'Visualizations' },
+            ];
+            return (
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+                    {items.map(item => (
+                        <button key={item.key} onClick={() => navigate(item.key)}
+                            style={{
+                                padding: '0.5rem 1.25rem',
+                                background: active === item.key ? 'var(--primary)' : 'white',
+                                color: active === item.key ? 'white' : 'var(--primary)',
+                                border: '2px solid var(--primary)',
+                                borderRadius: '50px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: '500',
+                                transition: 'all 0.2s'
+                            }}>
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            );
+        }
+
+        function ImageCarousel({ images }) {
+            const [currentIndex, setCurrentIndex] = useState(0);
+
+            const nextSlide = () => {
+                setCurrentIndex((prev) => (prev + 1) % images.length);
+            };
+
+            const prevSlide = () => {
+                setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+            };
+
+            return (
+                <div style={{ position: 'relative', width: '100%', margin: '2.5rem 0', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 36px rgba(44,95,122,0.18)', background: '#111', userSelect: 'none' }}>
+
+                    {/* Image Track */}
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img
+                            key={currentIndex} /* force re-render for simple fade-in effect via CSS if we wanted, but keeps it simple */
+                            src={images[currentIndex].src}
+                            alt={images[currentIndex].caption}
+                            style={{
+                                width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                                animation: 'fadeIn 0.5s ease-in-out'
+                            }}
+                        />
+
+                        {/* Gradient Overlay for Text Readability */}
+                        <div style={{
+                            position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%',
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
+                            pointerEvents: 'none'
+                        }}></div>
+                    </div>
+
+                    {/* Navigation Arrows */}
+                    <button onClick={prevSlide} style={{
+                        position: 'absolute', top: '50%', left: '1.2rem', transform: 'translateY(-50%)',
+                        background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255,255,255,0.3)', width: '44px', height: '44px',
+                        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', zIndex: 10, fontSize: '1.2rem', color: 'white',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)', transition: 'all 0.2s'
+                    }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+                        ❮
+                    </button>
+
+                    <button onClick={nextSlide} style={{
+                        position: 'absolute', top: '50%', right: '1.2rem', transform: 'translateY(-50%)',
+                        background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255,255,255,0.3)', width: '44px', height: '44px',
+                        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', zIndex: 10, fontSize: '1.2rem', color: 'white',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)', transition: 'all 0.2s'
+                    }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+                        ❯
+                    </button>
+
+                    {/* Caption area (Overlayed inside the image) */}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.5rem 2rem', zIndex: 5 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '1rem' }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ color: 'white', fontSize: '1.3rem', fontWeight: '500', marginBottom: '0.4rem', fontFamily: "'Cormorant Garamond', serif" }}>
+                                    {images[currentIndex].caption}
+                                </div>
+                                {images[currentIndex].desc && (
+                                    <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem', lineHeight: '1.5', maxWidth: '80%' }}>
+                                        {images[currentIndex].desc}
+                                    </div>
+                                )}
+                            </div>
+                            <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', fontWeight: '600', letterSpacing: '2px' }}>
+                                {currentIndex + 1} / {images.length}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function DonRiverProblem() {
+            const imgCard = (src, alt, caption) => (
+                <figure style={{ margin: 0, borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                    <img src={src} alt={alt} style={{ width: '100%', objectFit: 'cover', display: 'block' }} />
+                    <figcaption style={{
+                        padding: '0.65rem 1rem',
+                        fontSize: '0.82rem',
+                        color: 'var(--text-medium)',
+                        fontStyle: 'italic',
+                        borderTop: '1px solid rgba(44,95,122,0.08)',
+                        background: 'white'
+                    }}>{caption}</figcaption>
+                </figure>
+            );
+
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of the Don River (Toronto)</h1>
+                        <DonRiverSubNav active="don-river-problem" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.75rem' }}>The Problem</h2>
+
+                        {/* Para 1 + watershed image inline */}
+                        <div className="methods-section">
+                            <p>The Don River drains an area of about 1,200 square kilometers in southern Ontario, falling about 250 meters in the 60 kilometers from its source as it makes its way into Lake Ontario.</p>
+
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard(
+                                    'https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705589/Don_Watershed_Screenshot_tmddpm.png',
+                                    'Don River watershed map',
+                                    'Don River watershed'
+                                )}
+                            </div>
+
+                            <p>Heavy rainfalls often cause flooding. Major floods occurred in 1869, 1879, 1884, 1910, 1916, 1918, 1928, 1940, 1946, 1955, 1970, 1979, 1980, 1991, 2008, and 2024.</p>
+
+                            <ImageCarousel images={[
+                                {
+                                    src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1773631414/donriver_1918_o53svm.webp',
+                                    caption: 'Don River Flood, 1918',
+                                    desc: 'Historical image showing the impact of the 1918 Don River flooding.',
+                                },
+                                {
+                                    src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1773631414/donriver_1920_rvgmrc.png',
+                                    caption: 'Don River Flood, 1920',
+                                    desc: 'Historical image showing the impact of the 1920 Don River flooding.',
+                                },
+                                {
+                                    src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1773631414/donriver_2013_phamu1.webp',
+                                    caption: 'Don River Flood, 2013',
+                                    desc: 'Severe flooding in the Don River valley during the 2013 storm.',
+                                },
+                                {
+                                    src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1773631413/donriver_2024_vkk8z3.jpg',
+                                    caption: 'Don River Flood, 2024',
+                                    desc: 'Recent flooding events in the Don River demonstrating ongoing vulnerability.',
+                                }
+                            ]} />
+                        </div>
+
+                        {/* Para 2: Improvement Plan */}
+                        <div className="methods-section">
+                            <p>In 1886, the city of Toronto initiated the <a href="https://jenniferbonnell.com/books-publications/reclaiming-the-don/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>"Don River Improvement Plan"</a>. Concerns that led to this Plan were threefold: public health dangers from urban wastes including sewage in the river, damage from floods, and impediments to Lake Ontario shipping from silt build-up erroneously attributed to the river. The plan was to widen, deepen, and straighten the river channel in the last 2 kilometers before it reached the lake. Additional benefits from the plan were intended to be allowing ships to come up the river and railroad tracks on both banks of the river.</p>
+                        </div>
+
+                        {/* Para 3: Keating Channel — text then images then continuation */}
+                        <div className="methods-section">
+                            <p>The project suffered from cost overruns, technical missteps, political controversies, and a gradual weakening of its specifications. Most of its goals were not achieved. The final mistake was to build the Keating Channel, which forced the river to make a 90-degree turn as it approached the lake.</p>
+
+                            <div style={{ margin: '1.75rem 0' }}>
+                                {imgCard(
+                                    'https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705590/Keating_Channel_Screenshot_lu6cqa.png',
+                                    'The Keating Channel',
+                                    'The Keating Channel'
+                                )}
+                            </div>
+
+                            <p>Furthermore, the Channel was completed in 1922 at less than a third of the desired width. The right turn guaranteed that the industrial lands that were just south of the Keating Channel would also suffer from even worse flooding than before.</p>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function DonRiverSolution() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of the Don River (Toronto)</h1>
+                        <DonRiverSubNav active="don-river-solution" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.5rem' }}>A Proposed Solution</h2>
+
+                        {/* Section 1: 1989 public meeting */}
+                        <div className="methods-section">
+                            <p>In 1989, over 500 people attended a public meeting with the city of Toronto and the Toronto and Region Conservation Authority (TRCA) to discuss ways to clean up the Don watershed (<a href="https://www.waterfrontoronto.ca/news/bringing-back-don-30-years-citizen-advocacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Waterfront Toronto</a>). The TRCA was an organization set up by the province and then given enhanced powers after 81 people died during the 1954 flooding of the Humber River caused by Hurricane Hazel.</p>
+                        </div>
+
+                        {/* Section 2: 2007 competition + flood location images */}
+                        <div className="methods-section">
+                            <p>After years of discussion and planning, Waterfront Toronto announced in February 2007 an international design competition to finally solve the problem of flooding at the mouth of the Don:</p>
+
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                                gap: '1.25rem',
+                                margin: '1.75rem 0 2.25rem'
+                            }}>
+                                {[
+                                    { src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705588/Mouth_of_Don_Location_of_Port_Lands_Flood_Protection_bcbwww.png', caption: 'Port Lands Flood Protection location' },
+                                    { src: 'https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705589/Flyover_MouthofDonRiver_bpk2sf.png', caption: 'Flyover — Mouth of Don River' },
+                                ].map((img, i) => (
+                                    <figure key={i} style={{ margin: 0, borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                                        <img src={img.src} alt={img.caption} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block' }} />
+                                        <figcaption style={{
+                                            padding: '0.65rem 1rem',
+                                            fontSize: '0.82rem',
+                                            color: 'var(--text-medium)',
+                                            fontStyle: 'italic',
+                                            borderTop: '1px solid rgba(44,95,122,0.08)',
+                                            background: 'white'
+                                        }}>{img.caption}</figcaption>
+                                    </figure>
+                                ))}
+                            </div>
+
+                            {/* Section 3: park + Ookwemin images */}
+                            <p style={{ marginTop: '0.5rem' }}>The competition also aimed to create a major new park and space to house 15,000 people free of flooding, and to do all of this by re-engineering the mouth of the Don:</p>
+
+                            {/* Design image full-width first */}
+                            <figure style={{ margin: '1.75rem 0 1.25rem', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                                <img
+                                    src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705587/Ookwemin_Minising_Design_Screenshot_q2jddq.png"
+                                    alt="Ookwemin Minising — design"
+                                    style={{ width: '100%', display: 'block', objectFit: 'cover' }}
+                                />
+                                <figcaption style={{
+                                    padding: '0.65rem 1rem',
+                                    fontSize: '0.82rem',
+                                    color: 'var(--text-medium)',
+                                    fontStyle: 'italic',
+                                    borderTop: '1px solid rgba(44,95,122,0.08)',
+                                    background: 'white'
+                                }}>Ookwemin Minising — design</figcaption>
+                            </figure>
+
+                            {/* When complete image standalone */}
+                            <figure style={{ margin: '0 0 2rem', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                                <img
+                                    src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772705589/Ookwemin_Minising_When_Done_Screenshot_rx6yxm.png"
+                                    alt="Ookwemin Minising when complete"
+                                    style={{ width: '100%', display: 'block', objectFit: 'cover' }}
+                                />
+                                <figcaption style={{
+                                    padding: '0.65rem 1rem',
+                                    fontSize: '0.82rem',
+                                    color: 'var(--text-medium)',
+                                    fontStyle: 'italic',
+                                    borderTop: '1px solid rgba(44,95,122,0.08)',
+                                    background: 'white'
+                                }}>Ookwemin Minising when complete</figcaption>
+                            </figure>
+
+                            {/* References */}
+                            <div style={{
+                                background: 'rgba(44,95,122,0.04)',
+                                border: '1px solid rgba(44,95,122,0.12)',
+                                borderRadius: '8px',
+                                padding: '1.1rem 1.4rem',
+                                fontSize: '0.88rem',
+                                color: 'var(--text-medium)',
+                                lineHeight: '1.8'
+                            }}>
+                                <span style={{ fontWeight: '600', color: 'var(--primary)', marginRight: '0.5rem' }}>References:</span>
+                                <a href="https://www.waterfrontoronto.ca/our-projects/don-mouth-naturalization-and-port-lands-flood-protection" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Don Mouth Naturalization and Port Lands Flood Protection</a>
+                                <span style={{ margin: '0 0.5rem', color: 'var(--text-light)' }}>·</span>
+                                <a href="https://housing-infrastructure.canada.ca/alt-format/pdf/eval/2021-2-eval-twri-plfp-pt-eng.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Federal evaluation report</a>
+                                <span style={{ margin: '0 0.5rem', color: 'var(--text-light)' }}>·</span>
+                                <a href="https://www.mvvainc.com/projects/port-lands-flood-protection" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>MVVA design project</a>
+                            </div>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function DonRiverViz() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of the Don River (Toronto)</h1>
+                        <DonRiverSubNav active="don-river-viz" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.5rem' }}>Visualizations</h2>
+                        <div className="methods-section">
+                            <p>We have generated portrayals of real floods and plausible scenarios predicted by flood models. The figure portrays 10-, 100-, and 350-year (their "return periods" — measures of intensity) floods before and after the river mouth reconstruction completed in 2025.</p>
+                            <img
+                                src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707919/don_river_year_sde6oe.png"
+                                alt="Don River flood scenarios by return period"
+                                style={{ width: '100%', borderRadius: '8px', marginBottom: '2rem', display: 'block' }}
+                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707917/don_river_before_ozgwmd.png" alt="Don River before reconstruction" style={{ width: '100%', borderRadius: '8px' }} />
+                                    <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Before reconstruction</p>
+                                </div>
+                                <div>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1772707916/don_river_after_tzogow.png" alt="Don River after reconstruction" style={{ width: '100%', borderRadius: '8px' }} />
+                                    <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.9rem', marginTop: '0.5rem' }}>After reconstruction</p>
+                                </div>
+                            </div>
+                            <p>The Port Lands at the mouth of the river can now withstand major storms. There is still flooding to the east, which is being addressed by a subsequent flood mitigation project now underway (<a href="https://trcaca.s3.ca-central-1.amazonaws.com/app/uploads/2021/09/17175237/BEFP-Final-Class-EA-Report-August-2021_with-exec-summary.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>BEFP Final Class EA Report</a>).</p>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function FloodModellingPage() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Modelling and Visualizing Floods</h1>
+                        <div className="methods-section">
+                            <p>Our work proceeds as a series of case studies. The locations we study have experienced one or several instances of severe flooding and have gathered reliable data with which to calibrate and validate our models. The situations can be used to illustrate the difference in plausible future flooding based on the degree to which there is inaction (making future floods worse) or constructive actions (making the damage from future floods less severe).</p>
+                            <p>This website reports on our first case studies, <a href="#don-river" style={{ color: 'var(--primary)' }}>flooding at the mouth of the Don River (Toronto)</a>, and <a href="#etobicoke" style={{ color: 'var(--primary)' }}>flooding of the Little Etobicoke Creek (Mississauga)</a>.</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Flood Modelling Systems</h2>
+                            <p>Past flooding is reproduced mathematically by modelling the flood in one of a set of computer systems for doing this. Thus far, we have used in our work both <a href="https://www.esri.com/content/dam/esrisites/en-us/media/technical-papers/flood-simulation-arcgis-pro.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>ESRI ArcGIS</a> and the <a href="https://www.civilgeo.com/the-road-to-hec-ras/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>U.S. Army's HEC-RAS</a>.</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Model Inputs</h2>
+                            <p>Data used as input to a flood model includes:</p>
+                            <ul>
+                                <li>Topography;</li>
+                                <li>Land surface characteristics such as rivers and streams, dams and culverts;</li>
+                                <li>Underground streams and drainage systems; and</li>
+                                <li>Absorptive properties of structures on the ground such as building rooftops and parking lots.</li>
+                            </ul>
+                            <p>Models are driven by data on the water that comes from sources such as rainfall, tides, rising sea levels, and ocean surges. Models output descriptions of water flowing with varying velocities over landscapes over periods of time. If strong enough, these water flows are floods.</p>
+                        </div>
+                        <div className="methods-section">
+                            <h2>Future Projections</h2>
+                            <p>Once we can reproduce past flooding, we can use the model to imagine, project, and visualize future climate scenarios.</p>
+                            <p>Climate change continues to pump more greenhouse gases into the atmosphere and increase the earth's surface temperature. Rainfall becomes worse because there is more moisture in the atmosphere. Storms become worse and more unpredictable because of greater numbers of events such as rainstorms, hurricanes, typhoons, and tsunamis.</p>
+                            <p>On the other hand, concrete actions can be undertaken. Some actions affect the speed of climate change. These include decreasing our reliance on fossil fuels, increasing the use of electric vehicles, slowing the destruction of forests, substituting electronic communications for travel, and eating less meat. Other actions are specific to flood prevention. These include reengineering rivers and how they flow; increasing the capacity of drainage systems; constructing barriers to the flow of water such as dams and levees; and modifying the absorptive qualities of upstream land features.</p>
+                            <p>We believe (and will gather evidence as one of our research activities) that such modelling and visualizing exercises will give people a greater sense of agency with respect to climate change and the vagaries of extreme weather, and will be a tool to enable more open, thoughtful, and constructive policy deliberations.</p>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function ComingSoonPage({ title }) {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>{title}</h1>
+                        <div className="methods-section" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+                            <p style={{ fontSize: '1.2rem', color: 'var(--text-medium)' }}>This section is currently under development.</p>
+                            <p>Please check back later for updates as we continue our research and publish new content.</p>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function EtobicokeSubNav({ active }) {
+            const navigate = (p) => { window.location.hash = p; };
+            const items = [
+                { key: 'etobicoke', label: 'Overview' },
+                { key: 'etobicoke-problem', label: 'The Problem' },
+                { key: 'etobicoke-solution', label: 'A Proposed Solution' },
+                { key: 'etobicoke-viz', label: 'Visualizations' },
+            ];
+            return (
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+                    {items.map(item => (
+                        <button key={item.key} onClick={() => navigate(item.key)}
+                            style={{
+                                padding: '0.5rem 1.25rem',
+                                background: active === item.key ? 'var(--primary)' : 'white',
+                                color: active === item.key ? 'white' : 'var(--primary)',
+                                border: '2px solid var(--primary)',
+                                borderRadius: '50px',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem',
+                                fontWeight: '500',
+                                transition: 'all 0.2s'
+                            }}>
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            );
+        }
+
+        function EtobicokeProblem() {
+            const imgCard = (src, alt, caption) => (
+                <figure style={{ margin: 0, borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                    {src ? (
+                        <img src={src} alt={alt} style={{ width: '100%', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                        <div style={{ width: '100%', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', fontStyle: 'italic', background: 'var(--bg-light)', border: '2px dashed var(--border)' }}>
+                            [{alt}]
+                        </div>
+                    )}
+                    <figcaption style={{
+                        padding: '0.65rem 1rem',
+                        fontSize: '0.82rem',
+                        color: 'var(--text-medium)',
+                        fontStyle: 'italic',
+                        borderTop: '1px solid rgba(44,95,122,0.08)',
+                        background: 'white'
+                    }}>{caption}</figcaption>
+                </figure>
+            );
+
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of Little Etobicoke Creek (Mississauga)</h1>
+                        <EtobicokeSubNav active="etobicoke-problem" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.75rem' }}>The Problem</h2>
+
+                        <div className="methods-section">
+                            <p>The Little Etobicoke Creek (LEC), a tributary of Etobicoke Creek, winds its way southwards in central Mississauga from just west of Toronto Pearson International Airport to Lake Ontario.</p>
+
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard(
+                                    'https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632297/LEC_map_screenshot_2026-03-09_at_10.04.12_copy_vka4bi.png',
+                                    'Little Etobicoke Creek map',
+                                    'Little Etobicoke Creek map'
+                                )}
+                            </div>
+
+                            <p>Decades ago, much of the water from severe rainstorms in Mississauga was absorbed by farm in the north part of the city. Now, these absorptive materials have been replaced by homes, factories, stores, and parking lots. And storms have become more severe due to climate change. Floods are occurring more often, and they do more damage, for example, in 2005, 2009, 2013, and 2024.</p>
+
+                            <p>The 2013 flood and two floods in 2024 of Little Etobicoke Creek were particularly destructive.</p>
+
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632296/2024_Storm_of_Metro_Toronto_from_the_lake_copy_dbfrgt.jpg', '2024 Storm of Metro Toronto', '2024 Storm of Metro Toronto from the lake')}
+                            </div>
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632297/Rainfall_accumulation_2024Aug_17_copy_mqqdsi.png', '2024 Storm Rainfall', 'Rainfall accumulation 2024 Aug 17')}
+                            </div>
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632296/LEC_near_Dixie_Landscape_Screenshot_2025-09-11_204435_copy_aafswh.png', 'LEC near Dixie Landscape', 'LEC near Dixie Landscape')}
+                            </div>
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632298/2013_Major_flooding_of_LEC_screenshot_2026-03-09_at_10.02.24_copy_yygp89.png', '2013 Major flooding of LEC', '2013 Major flooding of LEC')}
+                            </div>
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632294/oblique_VIEW_of_LEC_FLOOD_copy_okgqeo.png', 'Oblique view of LEC flood', 'Oblique view of LEC flood')}
+                            </div>
+
+                            <p><strong>Videos:</strong></p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <video src="https://res.cloudinary.com/dd4p37hyq/video/upload/v1773632304/350-Year-LEC-Flood-3h_2D_copy_qszoz4.mp4" controls style={{ width: '100%', borderRadius: '10px', boxShadow: '0 4px 18px rgba(44,95,122,0.13)' }} />
+                                    <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.85rem', marginTop: '0.5rem', fontStyle: 'italic' }}>350-Year LEC Flood 2D</p>
+                                </div>
+                                <div>
+                                    <video src="https://res.cloudinary.com/dd4p37hyq/video/upload/v1773632306/100_Year_LEC_Flyover-3D_copy_mgftbb.mp4" controls style={{ width: '100%', borderRadius: '10px', boxShadow: '0 4px 18px rgba(44,95,122,0.13)' }} />
+                                    <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '0.85rem', marginTop: '0.5rem', fontStyle: 'italic' }}>100-Year LEC Flyover 3D</p>
+                                </div>
+                            </div>
+
+                            <p style={{ marginTop: '1.5rem' }}>Read more:</p>
+                            <ul>
+                                <li><a href="https://thepointer.com/article/2024-07-29/11-years-2-destructive-floods-millions-in-damages-why-hasn-t-mississauga-moved-quicker-to-protect-residents" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>11 years, 2 destructive floods, millions in damages: Why hasn't Mississauga moved quicker to protect residents? (The Pointer)</a></li>
+                                <li><a href="https://www.mississauga.com/news/council/start-the-project-immediately-mississauga-residents-push-city-to-speed-up-80m-stormwater-plan-after/article_f21a06a6-916f-594a-b2d3-86df8b66bb82.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>'Start the project immediately': Mississauga residents push city to speed up $80M stormwater plan (Mississauga.com)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function EtobicokeSolution() {
+            const imgCard = (src, alt, caption) => (
+                <figure style={{ margin: 0, borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 18px rgba(44,95,122,0.13)', background: '#f0f4f7' }}>
+                    {src ? (
+                        <img src={src} alt={alt} style={{ width: '100%', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                        <div style={{ width: '100%', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', fontStyle: 'italic', background: 'var(--bg-light)', border: '2px dashed var(--border)' }}>
+                            [{alt}]
+                        </div>
+                    )}
+                    <figcaption style={{
+                        padding: '0.65rem 1rem',
+                        fontSize: '0.82rem',
+                        color: 'var(--text-medium)',
+                        fontStyle: 'italic',
+                        borderTop: '1px solid rgba(44,95,122,0.08)',
+                        background: 'white'
+                    }}>{caption}</figcaption>
+                </figure>
+            );
+
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of Little Etobicoke Creek (Mississauga)</h1>
+                        <EtobicokeSubNav active="etobicoke-solution" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.5rem' }}>A Proposed Solution</h2>
+
+                        <div className="methods-section">
+                            <p>In response to the flooding, the city of Mississauga commissioned several studies and held public meetings to report on the results. Coincidentally, the final report was published in May 2024, soon before the 2024 floods.</p>
+                            <p>The report recommended close to $80M worth of improvements including widening and deepening the creek near where it tends to flood as it makes a critical turn near Queen Frederica Drive, and also replacing the nearby bridge over Dixie Road with a greater span and with larger culverts that will allow more water to flow through.</p>
+
+                            <div style={{ margin: '1.5rem 0' }}>
+                                {imgCard('https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632297/2024_Dixie_Area_Proposal_FLOOD._MITIGATION_Screenshot_2026-03-09_at_10.19.27_copy_d6uwbg.png', 'Dixie Area Proposal', '2024 Dixie Area Proposal Flood Mitigation')}
+                            </div>
+
+                            <p>Reports:</p>
+                            <ul>
+                                <li><a href="https://www.mississauga.ca/wp-content/uploads/2023/05/Dixie-Dundas_PIC-2_FINAL.pdf#:~:text=The%20Dixie%2DDundas%20Flood%20Mitigation%20Feasibility,to%20protect%20existing%20residences%20and" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Dixie-Dundas Flood Mitigation Feasibility Study (PIC)</a></li>
+                                <li><a href="https://www.mississauga.ca/wp-content/uploads/2024/06/19152312/dixie-dundas-flood-mitigation-environmental-assessment-study.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Dixie-Dundas Flood Mitigation Environmental Assessment Study</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function EtobicokeViz() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Flooding of Little Etobicoke Creek (Mississauga)</h1>
+                        <EtobicokeSubNav active="etobicoke-viz" />
+                        <h2 style={{ color: 'var(--primary)', marginBottom: '1.5rem' }}>Visualizations</h2>
+
+                        <div className="methods-section">
+                            <p>We have re-created and visualized the 2013 and 2024 LEC floods, focusing on the area near Queen Frederika Drive, Dixie Road, and just south of there.</p>
+                            <p>Below we show how damage varies with the storm intensity (top: 10-year storm; below: 100- and 350-year storms); and how effects could be reduced by what engineers have recommended — the riverbed channel deepening and widening; and replacing a bridge with one that has larger culverts and so is better able to support greater flow to the east. What is interesting is that neither expanding the river channel nor replacing the bridge succeed in mitigating the damage if done by themselves.</p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '2.5rem' }}>
+                                {/* Top: 10-year storm */}
+                                <div style={{ background: 'white', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 4px 18px rgba(44,95,122,0.08)' }}>
+                                    <h3 style={{ fontSize: '1.4rem', color: 'var(--primary)', marginBottom: '0.5rem', textAlign: 'center' }}>10-Year Flood</h3>
+                                    <p style={{ color: 'var(--text-medium)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '1rem' }}>Common flood scenario</p>
+                                    <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632897/etobicoke_10yr_z0an1b.png" alt="10-Year Flood Simulation" style={{ width: '100%', borderRadius: '6px', display: 'block' }} />
+                                </div>
+
+                                {/* Below: 100- and 350-year storms */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                                    <div style={{ background: 'white', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 4px 18px rgba(44,95,122,0.08)' }}>
+                                        <h3 style={{ fontSize: '1.4rem', color: 'var(--primary)', marginBottom: '0.5rem', textAlign: 'center' }}>100-Year Flood</h3>
+                                        <p style={{ color: 'var(--text-medium)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '1rem' }}>Major flood scenario</p>
+                                        <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632896/etobicoke_100yr_mnstlq.png" alt="100-Year Flood Simulation" style={{ width: '100%', borderRadius: '6px', display: 'block' }} />
+                                    </div>
+
+                                    <div style={{ background: 'white', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 4px 18px rgba(44,95,122,0.08)' }}>
+                                        <h3 style={{ fontSize: '1.4rem', color: 'var(--primary)', marginBottom: '0.5rem', textAlign: 'center' }}>350-Year Flood</h3>
+                                        <p style={{ color: 'var(--text-medium)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '1rem' }}>Extreme flood scenario</p>
+                                        <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1773632896/etobicoke_350yr_l6vv7i.png" alt="350-Year Flood Simulation" style={{ width: '100%', borderRadius: '6px', display: 'block' }} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function PartnersPage() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Partners</h1>
+                        <div className="methods-section">
+                            <ul>
+                                <li><a href="https://www.dgp.toronto.edu/" target="_blank" rel="noopener noreferrer">Dynamic Graphics Project</a>, Department of Cities, and School of Cities, UofT</li>
+                                <li><a href="https://climatesmartlab.ca/" target="_blank" rel="noopener noreferrer">Climate Smart Lab, UPEI</a></li>
+                                <li>Departments of Psychology, <a href="https://socialsciences.viu.ca/psychology" target="_blank" rel="noopener noreferrer">VIU</a> and <a href="https://www.uvic.ca/socialsciences/psychology/index.php" target="_blank" rel="noopener noreferrer">University of Victoria</a></li>
+                                <li><a href="https://www.ocadu.ca/" target="_blank" rel="noopener noreferrer">Ontario College of Art and Design</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+        function SponsorsPage() {
+            return (
+                <>
+                    <div className="methods-page">
+                        <h1>Sponsors</h1>
+                        <div className="methods-section">
+                            <ul>
+                                <li>Holgan 8T8 Foundation</li>
+                                <li>Department of Computer Science, University of Toronto</li>
+                                <li>School of Cities, University of Toronto</li>
+                                <li>William T. Reeves and Ricki Blau</li>
+                                <li>John Baker</li>
+                                <li>Kim Davidson</li>
+                                <li>SideFX</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <Footer />
+                </>
+            );
+        }
+
+
+        function App() {
+            const [page, setPage] = useState('home');
+
+            React.useEffect(() => {
+                const handleHash = () => {
+                    const h = window.location.hash.replace('#', '') || 'home';
+                    setPage(h);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+                window.addEventListener('hashchange', handleHash);
+                handleHash();
+                return () => window.removeEventListener('hashchange', handleHash);
+            }, []);
+
+            const goHome = () => { window.location.hash = ''; };
+            const goTo = (p) => { window.location.hash = p; };
+
+            return (
+                <div>
+                    <Navigation currentPage={page} />
+                    {page === 'home' && <LandingPage />}
+                    {page === 'climate-change' && <ComingSoonPage title="Climate Change" />}
+                    {page === 'extreme-weather' && <ComingSoonPage title="Extreme Weather" />}
+                    {page === 'climate-fuels' && <ComingSoonPage title="How Climate Change Fuels Extreme Weather" />}
+                    {page === 'methodology' && <MethodologyPage onPrev={goHome} onRestart={goHome} />}
+                    {page === 'flood-modelling' && <FloodModellingPage />}
+                    {page === 'wildfire-modelling' && <ComingSoonPage title="Modelling and Visualizing Wildfires" />}
+                    {page === 'don-river' && <DonRiver onNext={() => goTo('etobicoke')} onPrev={goHome} />}
+                    {page === 'don-river-problem' && <DonRiverProblem />}
+                    {page === 'don-river-solution' && <DonRiverSolution />}
+                    {page === 'don-river-viz' && <DonRiverViz />}
+                    {page === 'etobicoke' && <Etobicoke onNext={() => goTo('team')} onPrev={() => goTo('don-river')} />}
+                    {page === 'etobicoke-problem' && <EtobicokeProblem />}
+                    {page === 'etobicoke-solution' && <EtobicokeSolution />}
+                    {page === 'etobicoke-viz' && <EtobicokeViz />}
+                    {page === 'north-rustico' && <ComingSoonPage title="North Rustico Flooding (Prince Edward Island)" />}
+                    {page === 'fort-mcmurray' && <ComingSoonPage title="Fort McMurray Wildfire (Alberta)" />}
+                    {page === 'team' && <TeamPage onNext={() => goTo('methodology')} onPrev={() => goTo('etobicoke')} />}
+                    {page === 'partners' && <PartnersPage />}
+                    {page === 'sponsors' && <SponsorsPage />}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>

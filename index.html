@@ -2353,7 +2353,17 @@
         function App() {
             const [page, setPage] = useState('home');
             React.useEffect(() => {
-                const handle = () => { const h = window.location.hash.replace('#', '') || 'home'; setPage(h); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                const handle = () => { 
+                    const h = window.location.hash.replace('#', '') || 'home'; 
+                    setPage(h); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                    
+                    // Force Analytics Tracking for Hash Routing SPA
+                    if (window.op) {
+                        try { window.op('trackScreenView'); } catch(e) {}
+                        try { window.op('track', 'Page Opened', { page: h }); } catch(e) {}
+                    }
+                };
                 window.addEventListener('hashchange', handle);
                 handle();
                 return () => window.removeEventListener('hashchange', handle);

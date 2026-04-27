@@ -2344,12 +2344,12 @@
                 { name: 'SideFX', url: 'https://www.sidefx.com/' },
             ];
             const individual = [
-                { name: 'William T. Reeves and Ricki Blau' },
-                { name: 'John Baker' },
-                { name: 'Kim Davidson' },
-                { name: 'Ronald Baecker' },
-                { name: 'Michael Brown' },
-                { name: 'William Buxton' },
+                { name: 'William T. Reeves and Ricki Blau', url: 'https://en.wikipedia.org/wiki/William_Reeves_(animator)' },
+                { name: 'John Baker', url: 'https://www.d2l.com/about/executive-leadership/john-baker/' },
+                { name: 'Kim Davidson', url: 'https://www.sidefx.com/' },
+                { name: 'Ronald Baecker', url: 'https://ronbaecker.com/' },
+                { name: 'Michael Brown', url: 'https://www.eecs.yorku.ca/~mbrown/' },
+                { name: 'William Buxton', url: 'http://billbuxton.com/' },
             ];
             const Row = ({ name, url }) => (
                 <div
@@ -2374,7 +2374,7 @@
                             </Block>
                             <Block label="Individual">
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    {individual.map((s, i) => <Row key={i} name={s.name} url={null} />)}
+                                    {individual.map((s, i) => <Row key={i} name={s.name} url={s.url || null} />)}
                                 </div>
                             </Block>
                         </div>

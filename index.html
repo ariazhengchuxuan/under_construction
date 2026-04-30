@@ -1854,6 +1854,24 @@
                                     style={{ width: '100%', height: 'auto', borderRadius: '8px', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }} 
                                 />
                             </Block>
+                            <Block label="April 2026 Media Release">
+                                <p><em>Published by the Department of Computer Science, University of Toronto — Earth Day, April 21, 2026</em></p>
+                                <p style={{ marginTop: '0.9rem' }}>
+                                    The UofT Department of Computer Science featured our work in a media release titled <strong>"Researchers' visualizations demonstrate a future with climate action — or inaction."</strong> The piece highlights how our interdisciplinary team uses flood and wildfire modelling, data visualization, design, and environmental psychology to translate complex climate data into compelling experiences that can spur individuals, communities, and governments to act.
+                                </p>
+                                <p>
+                                    Starting from documented extreme weather events — including the 2013 and 2024 Little Etobicoke Creek floods and the 2016 Fort McMurray wildfire — the team builds and validates simulation models, then systematically varies them to show how the future diverges depending on whether we act or remain idle. The raw model outputs are then converted into novel images, animations, and eventually immersive experiences that make abstract climate risks feel real and local.
+                                </p>
+                                <div style={{ background: 'var(--blue-pale)', borderLeft: '3px solid var(--accent)', padding: '1rem 1.25rem', margin: '1.25rem 0', borderRadius: '0 6px 6px 0' }}>
+                                    <p style={{ margin: 0, fontStyle: 'italic', color: 'var(--ink-mid)' }}>
+                                        "If we can show people that the floods and fires they're already worried about will get worse with inaction — but that concrete steps can make things better — I think that's a powerful way to get people and society to move."
+                                    </p>
+                                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.88rem', color: 'var(--text-light)', fontWeight: 600 }}>— Ron Baecker, Professor Emeritus, University of Toronto</p>
+                                </div>
+                                <a className="text-link ext" href="https://web.cs.toronto.edu/news-events/news/envisioning-climate-futures" target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('external_link_clicked', { url: 'cs_media_release' })}>
+                                    <strong>Read the full media release →</strong>
+                                </a>
+                            </Block>
                         </div>
                     </div>
                     <Footer />

@@ -337,7 +337,20 @@
             overflow: hidden;
             max-width: calc(100% - 60px);
             display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo-text {
+            display: flex;
             flex-direction: column;
+        }
+
+        .nav-logo-img {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
         }
 
         .nav-logo-line1 {
@@ -1083,6 +1096,11 @@
         @media(max-width:860px) {
             .nav-logo {
                 max-width: calc(100% - 52px);
+                gap: 8px;
+            }
+
+            .nav-logo-img {
+                height: 36px;
             }
 
             .nav-logo-line1,
@@ -1470,8 +1488,11 @@
                     <div className="nav-brand-bar">
                         <div className="nav-content">
                             <div className="nav-logo" onClick={() => navigate('home')}>
-                                <span className="nav-logo-line1">Envisioning</span>
-                                <span className="nav-logo-line2">Climate Futures</span>
+                                <img src="https://res.cloudinary.com/dd4p37hyq/image/upload/v1777839310/logo_fit_dgoe8d.png" alt="Envisioning Climate Futures Logo" className="nav-logo-img" />
+                                <div className="nav-logo-text">
+                                    <span className="nav-logo-line1">Envisioning</span>
+                                    <span className="nav-logo-line2">Climate Futures</span>
+                                </div>
                             </div>
                             <Burger />
                         </div>
